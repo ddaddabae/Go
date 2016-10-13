@@ -33,14 +33,18 @@ func main() {
     }
 
     var digit = regexp.MustCompile(`[0-9]`)
-    var non_valid_input = regexp.MustCompile(`[A-Za-z!@#$%^&()_~=]`)
+    var non_valid_input = regexp.MustCompile(`[A-Za-z\\!@#$%^&()_~=]`)
     if non_valid_input.MatchString(text) == true || 
        digit.MatchString(text[len(text)-1:]) == false {
-      fmt.Println("잘못된 입력입니다.")
+      fmt.Println("잘못된 입력입니다.\n")
       continue
     }
     for i := 0; i < len(text)-1; i++ {
-      if (text[i:i+1] == "+" || text[i:i+1] == "-" || text[i:i+1] == "*" || text[i:i+1] == "/") && (text[i+1:i+2] == "+" || text[i+1:i+2] == "-" || text[i+1:i+2] == "*" || text[i+1:i+2] == "/") {
+      if (text[i:i+1] == "+" || text[i:i+1] == "-" || text[i:i+1] == "*" || text[i:i+1] == "/") && (text[i+1:i+2] == "+" || text[i+1:i+2] == "*" || text[i+1:i+2] == "/") {
+        fmt.Println("잘못된 입력입니다.")
+        return
+      }
+      if (i < len(text)-2) && (text[i:i+1] == "-" && text[i+1:i+2] == "-" && text[i+2:i+3] == "-") {
         fmt.Println("잘못된 입력입니다.")
         return
       }
@@ -111,14 +115,23 @@ func main() {
           stack = append(stack, strconv.Itoa(num_1 * num_2))
         }
         if postfix[i] == "/" {
+          if num_2 == 0 {
+            stack = stack[:0]
+            stack = append(stack, "∞")
+            break
+          }
           stack = append(stack, strconv.Itoa(num_1 / num_2))
         }
       } else {
         stack = append(stack, postfix[i])
       }
     }
-    results, _ := strconv.Atoi(stack[0])
-    fmt.Printf("답: %d \n\n", results)
+    if stack[0] != "∞" {
+      results, _ := strconv.Atoi(stack[0])
+      fmt.Printf("답: %d \n\n", results)
+    } else {
+      fmt.Printf("답: %s \n\n", stack[0])
+    }
   }
 }
 
